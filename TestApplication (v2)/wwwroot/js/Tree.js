@@ -125,15 +125,16 @@ var MusicApp = new Vue({
         return {
             treeData: [],
             tracks: [],
-            searchString: ''
+            searchString: '',
+            loading: false
         };
     },
     mounted() {
+      
         this.refreshData();
     },
     computed: {
         filtered: function () {
-
             this.refreshData();
             if (this.searchString === '') return this.treeData;
             return treeFilter(this.treeData, this.searchString);
@@ -142,16 +143,22 @@ var MusicApp = new Vue({
     methods: {
         refreshData: function () {
             $.get('/Home/GetTree')
-                .done(response => { this.treeData = response; })
-                .fail(err => { $.notify("Ошибка: " + err.statusText) });
+                .done(response => {
+                    this.loading = false;
+                    this.treeData = response;               
+                })
+                .fail(err => { $.notify("Ошибка: " + err.statusText); });
+        
         },
         selectnode: function (element) {
-            debugger;
+     
             if (!element.album) {
+                this.loading = true;
                 $.get('/Home/GetTracks?albumId=' + element.id)
-                    .done(response => { response ? this.tracks = response : null })
+                    .done(response => { response ? this.tracks = response : null; this.loading = false; })
                     .fail(err => { $.notify("Ошибка: " + err.statusText) });
             }
+             
         },
         trackInfoPost: function (track) {
             debugger;

@@ -1,4 +1,5 @@
 ﻿<link rel="stylesheet" href="~/css/Tree.css" />
+<link rel="stylesheet" href="~/css/Loader.css" />
 
 
 
@@ -37,7 +38,7 @@
                  class="icon inline"
                  v-bind:class="{'like-button-active' : like, 'like-button' : !like}"></div>
 
-            <div class="inline" >{{ track.rating }}</div>
+            <div class="inline">{{ track.rating }}</div>
 
             <transition name="favorite-fade">
                 <div v-show="track.isFavorite || like"
@@ -46,7 +47,7 @@
                      v-bind:class="{'favorite-button-active' : track.isFavorite, 'favorite-button' : !track.isFavorite}"></div>
             </transition>
         </div>
-      
+
     </li>
 </script>
 
@@ -57,13 +58,18 @@
 <div class="data-container">
 
     <div class="tree-container inline" id="MusicApp">
+        <div v-show="loading" id="loader">
+            <span class="spinner"></span>
+        </div>
         <div>
             <div>Поиск:</div>
             <input type="text" v-model="searchString" class="form-control form-control-lg" />
         </div>
 
         <div class="treeView form-control scrollbar">
+
             <ul>
+
                 <tree-item v-for="item in filtered"
                            class="item"
                            @@node-change="selectnode"
@@ -79,5 +85,7 @@
         </div>
     </div>
 </div>
+
+
 <script src="~/lib/notify.js/notify.min.js"></script>
 <script src="~/js/Tree.js"></script>
