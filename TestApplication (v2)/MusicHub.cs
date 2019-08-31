@@ -13,6 +13,7 @@ namespace TestApplication__v2_
         public Task TrackUpdate(string id, string rating)
         {
             return Clients.All.SendAsync("TrackUpdate", id, rating);
+
         }
 
         
