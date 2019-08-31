@@ -1,0 +1,78 @@
+﻿<link rel="stylesheet" href="~/css/Tree.css" />
+
+
+
+<script type="text/x-template" id="tree-item-template">
+    <li>
+        <div class="item-name"
+             @@click="detail(item)">
+            {{ item.name }}
+            <span @@click="toggle"
+                  v-if="isFolder">{{ isOpen ? '-' : '+' }}</span>
+        </div>
+        <transition name="item-fade">
+            <ul v-show="isOpen" v-if="isFolder">
+                <tree-item class="item"
+                           @@node-change="$emit('node-change', $event)"
+                           v-for="(child, index) in item.album"
+                           :key="index"
+                           :item="child">
+                </tree-item>
+            </ul>
+        </transition>
+    </li>
+</script>
+
+
+
+<script type="text/x-template" id="track-item-template">
+    <li class="track-box">
+        <div class="track-info"> {{ track.name }}</div>
+        <div class="track-status">
+            <div @@click="dislikeHandler"
+                 class="icon inline"
+                 v-bind:class="{'dislike-button-active' : dislike, 'dislike-button' : !dislike}"></div>
+
+            <div @@click="likeHandler"
+                 class="icon inline"
+                 v-bind:class="{'like-button-active' : like, 'like-button' : !like}"></div>
+
+            <div class="inline" >{{ track.rating }}</div>
+
+            <transition name="favorite-fade">
+                <div v-show="track.isFavorite || like"
+                     @@click="favoriteHandler"
+                     class="icon inline"
+                     v-bind:class="{'favorite-button-active' : track.isFavorite, 'favorite-button' : !track.isFavorite}"></div>
+            </transition>
+        </div>
+      
+    </li>
+</script>
+
+
+
+<div>Поиск:</div>
+
+<div class="data-container">
+    <div class="tree-container inline" id="MusicApp">
+        <input type="text" v-model="searchString" class="form-control form-control-lg" />
+        <div class="treeView form-control scrollbar">
+            <ul>
+                <tree-item v-for="item in filtered"
+                           class="item"
+                           @@node-change="changenode"
+                           :item="item">
+                </tree-item>
+            </ul>
+        </div>
+        <div class="detail-container inline">
+            <div class="info-block form-control "></div>
+            <div class="track-block form-control scrollbar">
+                <track-item v-for="track in tracks" :track="track"></track-item>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/lib/notify.js/notify.min.js"></script>
+<script src="~/js/Tree.js"></script>
