@@ -22,8 +22,6 @@ namespace TestApplication__v2_.Controllers
                         .AsNoTracking()
                         .Include(p => p.Album)
                         .ToList();
-
-  
                     return Ok(treeData);
                 }
             }
@@ -76,22 +74,6 @@ namespace TestApplication__v2_.Controllers
                     return Ok();
                 }
 
-            }
-            catch (Exception)
-            {
-                return StatusCode(500);
-            }
-        }
-
-
-        public IActionResult Search(string str)
-        {
-            try
-            {
-                using (DataContext db = new DataContext())
-                {
-                 return Ok();
-                }
             }
             catch (Exception)
             {

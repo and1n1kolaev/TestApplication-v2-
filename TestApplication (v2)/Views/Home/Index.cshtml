@@ -52,24 +52,29 @@
 
 
 
-<div>Поиск:</div>
+
 
 <div class="data-container">
+
     <div class="tree-container inline" id="MusicApp">
-        <input type="text" v-model="searchString" class="form-control form-control-lg" />
+        <div>
+            <div>Поиск:</div>
+            <input type="text" v-model="searchString" class="form-control form-control-lg" />
+        </div>
+
         <div class="treeView form-control scrollbar">
             <ul>
                 <tree-item v-for="item in filtered"
                            class="item"
-                           @@node-change="changenode"
+                           @@node-change="selectnode"
                            :item="item">
                 </tree-item>
             </ul>
         </div>
         <div class="detail-container inline">
-            <div class="info-block form-control "></div>
+            <div>Список треков: </div>
             <div class="track-block form-control scrollbar">
-                <track-item v-for="track in tracks" :track="track"></track-item>
+                <track-item @@track-update="trackInfoPost" v-for="track in tracks" :track="track"></track-item>
             </div>
         </div>
     </div>

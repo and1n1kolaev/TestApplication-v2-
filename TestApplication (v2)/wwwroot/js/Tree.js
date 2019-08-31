@@ -1,4 +1,13 @@
-﻿Vue.component('track-item', {
+﻿
+var connection = new signalR.HubConnectionBuilder().withUrl("/mhub").build();
+connection.on("TrackUpdate", function (id, rating) {
+    let track = $.grep(MusicApp.tracks, function (el) { return el.id == id });
+    if (track) track[0].rating = rating;
+});
+connection.start();
+
+
+Vue.component('track-item', {
     template: '#track-item-template',
     props: {
         track: Object
@@ -30,11 +39,10 @@
                 this.track.rating++;
                 
             }
-
-       
+    
             this.like = !this.like;
             this.dislike = false;
-            this.trackInfoPost();
+            this.trackInfoUpdate();
            
         },
         dislikeHandler: function () {
@@ -51,7 +59,7 @@
             }
             this.dislike = !this.dislike;
             this.like = false
-            this.trackInfoPost();
+            this.trackInfoUpdate();
 
 
         },
@@ -61,18 +69,24 @@
             this.track.isFavorite ?
                 $.notify("Трек '" + this.track.name + "' добавлен в избранное", "success") :
                 $.notify("Трек '" + this.track.name + "' удален из избранного", "info");
-            this.trackInfoPost();
+            this.trackInfoUpdate();
         },
-        trackInfoPost: function () {
-            $.post('/Home/PostTrackInfo/', this.track)
-                .done(() => {
-                    return true;
-                })
-                .fail((err) => {
-                    $.notify("Ошибка: " + err);
-                    return false;
-                });
+        trackInfoUpdate: function () {
+            this.$emit('track-update', this.track);
         }
+        //trackInfoPost: function () {
+        //    $.post('/Home/PostTrackInfo/', this.track)
+        //        .done(() => {
+        //            connection.invoke("TrackUpdate", this.track.id, this.track.rating).catch(function (err) {
+        //                console.log(err);
+        //            });
+        //            return true;
+        //        })
+        //        .fail((err) => {
+        //            $.notify("Ошибка: " + err);
+        //            return false;
+        //        });
+        //}
     }
 })
 
@@ -99,6 +113,7 @@ Vue.component('tree-item', {
             }
         },
         detail: function (element) {
+            debugger;
             this.$emit('node-change', element);
         }
     }
@@ -118,7 +133,6 @@ var MusicApp = new Vue({
     },
     computed: {
         filtered: function () {
-            debugger;
 
             this.refreshData();
             if (this.searchString === '') return this.treeData;
@@ -131,13 +145,29 @@ var MusicApp = new Vue({
                 .done(response => { this.treeData = response; })
                 .fail(err => { $.notify("Ошибка: " + err.statusText) });
         },
-        changenode: function (element) {
+        selectnode: function (element) {
+            debugger;
             if (!element.album) {
                 $.get('/Home/GetTracks?albumId=' + element.id)
                     .done(response => { response ? this.tracks = response : null })
                     .fail(err => { $.notify("Ошибка: " + err.statusText) });
             }
+        },
+        trackInfoPost: function (track) {
+            debugger;
+            $.post('/Home/PostTrackInfo/', track)
+                .done(() => {
+                    connection.invoke("TrackUpdate", track.id, track.rating).catch(function (err) {
+                        console.log(err);
+                    });
+                    return true;
+                })
+                .fail((err) => {
+                    $.notify("Ошибка: " + err);
+                    return false;
+                });
         }
+
     }
 })
 
@@ -156,5 +186,6 @@ function treeFilter(data, filterStr) {
     });  
     return $.grep(data, function (el) { return !el.hidden; });   
 }
+
 
 
